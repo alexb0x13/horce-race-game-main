@@ -4,6 +4,31 @@
     box-sizing: border-box;
 }
 
+/* Font embedding for better compatibility */
+@font-face {
+    font-family: 'Inter';
+    src: url('https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2') format('woff2');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Inter';
+    src: url('https://fonts.gstatic.com/s/inter/v12/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2') format('woff2');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #f0f8ff;
@@ -87,7 +112,7 @@ canvas {
     font-size: 14px;
     color: #f1c40f;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-    font-family: 'Georgia', serif;
+    font-family: 'Inter', serif;
 }
 
 .horse-panel .scrollable-content {
@@ -108,6 +133,8 @@ canvas {
     width: 100%;
     padding: 0 5px;
     justify-content: space-around;
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
 }
 
 .horse-item {
@@ -143,10 +170,15 @@ canvas {
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 1.5em;
-    color: #fff;
+    color: #fff; /* Restoring original color */
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
-    font-family: 'Georgia', serif;
+    font-family: 'Inter', sans-serif;
     max-width: 100%;
+}
+
+.lane-number {
+    color: yellow;
+    font-weight: bold;
 }
 
 .horse-panel .race-controls {
@@ -337,6 +369,8 @@ canvas {
     color: #0a0000;
     margin-bottom: 10px;
     padding-top: 10px;
+    font-weight: bold;
+    font-family: "Outfit", sans-serif;
 }
 
 .results-title {

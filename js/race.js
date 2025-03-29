@@ -30,16 +30,58 @@ class RaceScene extends Phaser.Scene {
         // Load horse silhouette
         this.load.image('horse', 'assets/full-horse.png');
         
-        // Load crown of roses for winner
+        // Load crown image for victory
         this.load.image('crown', 'assets/crown-of-roses.png');
         
         // Load JEL Derby logo
         this.load.image('logo', 'assets/jel-derby-logo3.PNG');
         
         console.log("Preloading horse image and crown");
+        
+        // Load fonts using WebFontLoader
+        const scene = this;
+        
+        // Create a custom callback to ensure the scene waits for fonts to load
+        this.fontsLoaded = false;
+        
+        // Use WebFontLoader to properly load Inter font
+        WebFont.load({
+            google: {
+                families: ['Inter:400,700,900']
+            },
+            active: function() {
+                console.log('Inter font loaded successfully');
+                scene.fontsLoaded = true;
+            },
+            inactive: function() {
+                console.warn('Font loading failed - using fallback fonts');
+                scene.fontsLoaded = true; // Continue anyway
+            }
+        });
     }
     
     create() {
+        // Wait for fonts to load before proceeding
+        if (!this.fontsLoaded) {
+            console.log('Waiting for fonts to load...');
+            const scene = this;
+            const checkFonts = () => {
+                if (scene.fontsLoaded) {
+                    console.log('Fonts loaded, continuing with create()');
+                    scene.startCreate();
+                } else {
+                    console.log('Fonts not loaded yet, checking again in 50ms');
+                    setTimeout(checkFonts, 50);
+                }
+            };
+            checkFonts();
+            return;
+        }
+        
+        this.startCreate();
+    }
+    
+    startCreate() {
         // Set track dimensions based on screen size
         this.updateTrackDimensions();
         
@@ -90,7 +132,7 @@ class RaceScene extends Phaser.Scene {
         // Create countdown text
         this.countdownText = this.add.text(this.scale.width / 2, this.scale.height / 2, '', {
             fontSize: '64px',
-            fontFamily: 'Arial',
+            fontFamily: 'Inter',
             color: '#fff',
             fontStyle: 'bold',
             stroke: '#000',
@@ -277,7 +319,7 @@ class RaceScene extends Phaser.Scene {
                 horseElement.className = 'horse-item';
                 horseElement.innerHTML = `
                     <div class="horse-color" style="background-color: ${horseColor}"></div>
-                    <div class="horse-name">Lane ${i + 1}: ${horseName}</div>
+                    <div class="horse-name">Lane <span style="color: yellow; font-weight: bold;">${i + 1}</span>: ${horseName}</div>
                 `;
                 horseListElement.appendChild(horseElement);
                 
@@ -492,7 +534,7 @@ class RaceScene extends Phaser.Scene {
                 const horseElement = document.createElement('div');
                 horseElement.className = 'horse-item';
                 horseElement.innerHTML = `
-                    <div class="horse-position">${index + 1}</div> &nbsp;
+                    <div class="horse-position" style="color: yellow; font-weight: bold;">${index + 1}</div> &nbsp;
                     <div class="horse-color" style="background-color: ${Phaser.Display.Color.IntegerToColor(horse.color).rgba}"></div>
                     <div class="horse-name">${horse.name}</div>
                 `;

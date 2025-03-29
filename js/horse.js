@@ -154,12 +154,12 @@ class Horse {
         
         const strokeColor = (this.lane === 0) ? '#FFFFFF' : '#000000';
         this.laneText = this.scene.add.text(20, laneTextY + laneTextYOffset, `#${this.lane + 1}: ${this.name}`, { 
-            fontSize: '22px', 
-            fontFamily: 'Georgia',
+            fontSize: '28px', 
+            fontFamily: '"Inter", Arial, sans-serif',
             fontWeight: '900', 
             color: colorHex,
             stroke: strokeColor, 
-            strokeThickness: 3 
+            strokeThickness: 3
         });
         
         // Add varying offsets based on lane number to prevent stacking
@@ -173,7 +173,7 @@ class Horse {
         const nameOffsetY = this.sprite.height * this.sprite.scale * 0.5;
         this.nameText = this.scene.add.text(offsetX - nameOffsetX + horizontalVariation, startPosition.y - nameOffsetY + verticalVariation, this.name, { 
             fontSize: '18px', 
-            fontFamily: 'Arial',
+            fontFamily: 'Inter',
             color: '#000',
             backgroundColor: 'rgba(255, 255, 255, 0.7)',
             padding: { x: 2, y: 1 }
@@ -321,9 +321,9 @@ class Horse {
         // Update connecting line
         this.updateConnectingLine();
         
-        // Add a slight bobbing motion for running effect
-        this.legMovement = (this.legMovement || 0) + delta * 0.02;
-        const bobHeight = Math.sin(this.legMovement) * 1; 
+        // Add a merry-go-round style bobbing motion
+        this.legMovement = (this.legMovement || 0) + delta * 0.015; // Slowed down from 0.04
+        const bobHeight = Math.sin(this.legMovement) * 5.5; // Increased height from 1 to 3.5
         this.sprite.y += bobHeight;
         
         // Check if horse has finished race
