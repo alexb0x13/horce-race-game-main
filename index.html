@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEL Derby</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="assets/horse-silhouette.png" type="image/png">
+</head>
+<body>
+    <div class="container">
+        <!-- Game container where Phaser will render -->
+        <div id="game-container"></div>
+        
+        <!-- Horse lineup and race controls positioned as top banner -->
+        <div class="top-banner horse-panel">
+            <div class="panel-header"></div>
+            <div id="horse-list" class="scrollable-content"></div>
+            <div class="race-controls">
+                <button id="start-race" class="race-button">Start</button>
+                <button id="reset-race" class="race-button">Reset</button>
+            </div>
+        </div>
+        
+        <div class="race-info">
+            <div id="race-status-container">
+                <span id="race-time">Race Time: 0.00s</span><br>
+                <span id="lap-progress">Lap: 1/4</span>
+            </div>
+        </div>
+        
+        <div class="side-panel results-panel">
+            <div class="panel-header">
+            </div>
+            <div id="results-panel" class="scrollable-content"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <script src="js/nameGenerator.js"></script>
+    <script src="js/horse.js"></script>
+    <script src="js/race.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
