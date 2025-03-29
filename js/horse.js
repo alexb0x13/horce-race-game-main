@@ -186,6 +186,9 @@ class Horse {
         // Set a high depth value to ensure name labels appear on top of other elements like the logo
         this.nameText.setDepth(1000);
         
+        // Initially hide all name labels - only first place will be shown during race
+        this.nameText.setVisible(false);
+        
         // Create connecting line
         this.connectingLine = this.scene.add.graphics();
         // Set connecting line depth to be just below the name text
@@ -309,8 +312,8 @@ class Horse {
         
         this.sprite.rotation = finalRotation;
         
-        // Update name text position
-        if (this.nameText) {
+        // Update name text position only if horse is in first place
+        if (this.nameText && this.position === 1) {
             const nameOffsetX = this.sprite.width * this.sprite.scale * 0.5;
             const nameOffsetY = this.sprite.height * this.sprite.scale * 0.5;
             const horizontalVariation = (this.lane % 2 === 0) ? -40 - (this.lane * 3) : 40 + (this.lane * 3);
@@ -333,10 +336,10 @@ class Horse {
             
             // Ensure depth is maintained during updates
             this.nameText.setDepth(1000);
+            
+            // Update connecting line for first place horse
+            this.updateConnectingLine();
         }
-        
-        // Update connecting line
-        this.updateConnectingLine();
         
         // Add a merry-go-round style bobbing motion with unique rate per horse
         this.legMovement = (this.legMovement || this.bobbingPhase) + delta * this.bobbingRate;
@@ -351,10 +354,14 @@ class Horse {
     }
     
     updateConnectingLine() {
+        // Skip if components aren't available
         if (!this.connectingLine || !this.sprite || !this.nameText) return;
         
-        // Clear previous line
+        // Clear previous line - always do this first to prevent ghosting
         this.connectingLine.clear();
+        
+        // Only draw the line if this horse is in first place and the label is visible
+        if (this.position !== 1 || !this.nameText.visible) return;
         
         // Set line style - make it thinner and more transparent for better visibility
         this.connectingLine.lineStyle(0.8, this.color, 0.6);
@@ -440,15 +447,39 @@ class Horse {
     updateRacePositioningFactors() {
         if (!this.scene.raceInProgress || this.finished) return;
         
-        // Get all active horses
-        const activeHorses = this.scene.horses.filter(h => !h.finished);
-        if (activeHorses.length <= 1) return;
-        
-        // Sort horses by distance
-        const sortedHorses = [...activeHorses].sort((a, b) => b.distance - a.distance);
+        // Create a sorted list of horses based on distance
+        const sortedHorses = [...this.scene.horses].sort((a, b) => b.distance - a.distance);
         
         // Find horse position
         const position = sortedHorses.findIndex(h => h === this);
+        
+        // Update position for label visibility checks
+        const newPosition = position + 1; // 1-indexed position
+        
+        // If position changed, update visibility of labels
+        if (newPosition !== this.position) {
+            const wasFirstPlace = this.position === 1;
+            const isNowFirstPlace = newPosition === 1;
+            
+            this.position = newPosition;
+            
+            // Update nameText visibility - only first place gets a label
+            if (this.nameText) {
+                // Show label only if we're in first place
+                this.nameText.setVisible(isNowFirstPlace);
+                
+                // Clear the connecting line when losing first place
+                if (wasFirstPlace && !isNowFirstPlace && this.connectingLine) {
+                    this.connectingLine.clear();
+                    console.log(`${this.name} lost first place - clearing line`);
+                }
+                
+                // For debugging
+                if (isNowFirstPlace) {
+                    console.log(`${this.name} is now in first place - showing label`);
+                }
+            }
+        }
         
         // More moderate catch-up mechanics for trailing horses - keep the pack together
         if (position > 0) {
@@ -494,6 +525,136 @@ class Horse {
             
             this.catchUpFactor = 0;
         }
+    }
+    
+    updateSpritePosition() {
+        // Get position on track based on current distance
+        const lapDistance = this.distance % this.scene.trackLength;
+        const trackPos = this.scene.getPositionOnTrack(lapDistance, this.laneOffset);
+        
+        // Update horse position
+        this.sprite.x = trackPos.x;
+        this.sprite.y = trackPos.y;
+        
+        // Determine if the horse is on the left half of the track (between 25% and 75% of track length)
+        // This checks if the horse is roughly on the left side of the oval
+        const normalizedDistance = lapDistance / this.scene.trackLength;
+        const isOnLeftHalf = normalizedDistance > 0.5 && normalizedDistance < 0.95;
+        
+        // Set scale to flip horizontally when on left half
+        const currentScale = Math.abs(this.sprite.scaleX);
+        this.sprite.scaleX = isOnLeftHalf ? currentScale : -currentScale;
+        
+        // Set rotation based on track position and track section
+        // For the right half of track (normalized distance < 0.5 or > 0.95), use normal rotation
+        // For the left half (0.5 to 0.95), keep a more consistent rotation
+        let finalRotation;
+        
+        if (isOnLeftHalf) {
+            // When on left half, use a fixed rotation angle with small adjustments
+            // This prevents horses from appearing upside down
+            const baseLeftRotation = -Math.PI/2; // Base rotation for left side
+            // Apply a small adjustment based on position to create smoother transitions
+            const leftPositionFactor = (normalizedDistance - 0.6) / 0.45; // 0 to 1 as horse moves through left half
+            const rotationAdjustment = Math.sin(leftPositionFactor * Math.PI) * 0.75; // Small subtle adjustment
+            finalRotation = baseLeftRotation + rotationAdjustment;
+        } else {
+            // Normal rotation calculation for right half
+            finalRotation = trackPos.rotation + Math.PI/2;
+        }
+        
+        this.sprite.rotation = finalRotation;
+        
+        // Update name text position only if horse is in first place
+        if (this.nameText && this.position === 1) {
+            const nameOffsetX = this.sprite.width * this.sprite.scale * 0.5;
+            const nameOffsetY = this.sprite.height * this.sprite.scale * 0.5;
+            const horizontalVariation = (this.lane % 2 === 0) ? -40 - (this.lane * 3) : 40 + (this.lane * 3);
+            
+            // Determine if horse is in the top portion of the track
+            const isInTopPortion = this.sprite.y < this.scene.scale.height * 0.3;
+            
+            // Adjust vertical position based on horse location
+            let verticalVariation;
+            if (isInTopPortion) {
+                // When horse is at top of track, position label below or beside the horse
+                verticalVariation = 30 + (this.lane * 2); // Positive value moves label down
+            } else {
+                // Normal positioning for other parts of track
+                verticalVariation = -40 - (this.lane * 5); // Negative value moves label up
+            }
+            
+            this.nameText.x = this.sprite.x - nameOffsetX + horizontalVariation;
+            this.nameText.y = this.sprite.y - nameOffsetY + verticalVariation;
+            
+            // Ensure depth is maintained during updates
+            this.nameText.setDepth(1000);
+            
+            // Update connecting line for first place horse
+            this.updateConnectingLine();
+        } else if (this.connectingLine) {
+            // Ensure connecting line is cleared for non-first place horses
+            this.connectingLine.clear();
+        }
+    }
+    
+    reset() {
+        this.currentSpeed = 0;
+        this.distance = 0;
+        this.currentLap = 1;
+        this.finished = false;
+        this.finishTime = null;
+        this.position = null;
+        this.catchUpFactor = 0;
+        this.leadHandicap = 0; 
+        
+        // Randomize horse skills
+        this.randomizeSkills();
+        
+        // Use a middle lane as the reference path for all horses
+        const referenceIndex = Math.floor(this.scene.numHorses / 2) - 1; 
+        const laneWidth = Math.min(this.scene.trackWidth, this.scene.trackHeight) / 300; 
+        // Set all horses to follow the middle lane's path with minimal variation
+        this.laneOffset = (this.scene.numHorses - 1 - referenceIndex) * laneWidth;
+        // Add a tiny offset for visual separation (1/10th of the already small lane width)
+        this.laneOffset += (this.lane - referenceIndex) * (laneWidth * 0.1);
+        
+        // Reset position back to starting position
+        const startPosition = this.scene.getPositionOnTrack(0, this.laneOffset);
+        
+        // Apply the same horizontal offset as in createSprite to maintain fan-out effect
+        const horizontalOffset = this.lane * 20; // Keep this value consistent with createSprite
+        const offsetX = startPosition.x + horizontalOffset;
+        
+        this.sprite.x = offsetX;
+        this.sprite.y = startPosition.y;
+        this.sprite.rotation = startPosition.rotation + Math.PI/2;
+        
+        // Update name text position
+        const nameOffsetX = this.sprite.width * this.sprite.scale * 0.5;
+        const nameOffsetY = this.sprite.height * this.sprite.scale * 0.5;
+        if (this.nameText) {
+            const horizontalVariation = (this.lane % 2 === 0) ? -40 - (this.lane * 3) : 40 + (this.lane * 3);
+            const verticalVariation = -40 - (this.lane * 5); 
+            this.nameText.x = offsetX - nameOffsetX + horizontalVariation;
+            this.nameText.y = startPosition.y - nameOffsetY + verticalVariation;
+            
+            // Hide name labels at start of race
+            this.nameText.setVisible(false);
+        }
+        
+        // Clear any connecting lines
+        if (this.connectingLine) {
+            this.connectingLine.clear();
+        }
+        
+        // Update the lane text with new traits
+        if (this.laneText) {
+            // Only update the lane number and name, without traits
+            this.laneText.setText(`#${this.lane + 1}: ${this.name}`);
+        }
+        
+        this.legMovement = 0;
     }
     
     applyFinalLapBalancing() {
@@ -567,57 +728,6 @@ class Horse {
         
         // Moderate luck factor - still allows for some randomness
         this.luckFactor = Math.random() * 0.2 + 0.05; // Between 0.05 and 0.25 (reduced)
-    }
-    
-    reset() {
-        this.currentSpeed = 0;
-        this.distance = 0;
-        this.currentLap = 1;
-        this.finished = false;
-        this.finishTime = null;
-        this.position = null;
-        this.catchUpFactor = 0;
-        this.leadHandicap = 0; 
-        
-        // Randomize horse skills
-        this.randomizeSkills();
-        
-        // Use a middle lane as the reference path for all horses
-        const referenceIndex = Math.floor(this.scene.numHorses / 2) - 1; 
-        const laneWidth = Math.min(this.scene.trackWidth, this.scene.trackHeight) / 300; 
-        // Set all horses to follow the middle lane's path with minimal variation
-        this.laneOffset = (this.scene.numHorses - 1 - referenceIndex) * laneWidth;
-        // Add a tiny offset for visual separation (1/10th of the already small lane width)
-        this.laneOffset += (this.lane - referenceIndex) * (laneWidth * 0.1);
-        
-        // Reset position back to starting position
-        const startPosition = this.scene.getPositionOnTrack(0, this.laneOffset);
-        
-        // Apply the same horizontal offset as in createSprite to maintain fan-out effect
-        const horizontalOffset = this.lane * 20; // Keep this value consistent with createSprite
-        const offsetX = startPosition.x + horizontalOffset;
-        
-        this.sprite.x = offsetX;
-        this.sprite.y = startPosition.y;
-        this.sprite.rotation = startPosition.rotation + Math.PI/2;
-        
-        // Update name text position
-        const nameOffsetX = this.sprite.width * this.sprite.scale * 0.5;
-        const nameOffsetY = this.sprite.height * this.sprite.scale * 0.5;
-        if (this.nameText) {
-            const horizontalVariation = (this.lane % 2 === 0) ? -40 - (this.lane * 3) : 40 + (this.lane * 3);
-            const verticalVariation = -40 - (this.lane * 5); 
-            this.nameText.x = offsetX - nameOffsetX + horizontalVariation;
-            this.nameText.y = startPosition.y - nameOffsetY + verticalVariation;
-        }
-        
-        // Update the lane text with new traits
-        if (this.laneText) {
-            // Only update the lane number and name, without traits
-            this.laneText.setText(`#${this.lane + 1}: ${this.name}`);
-        }
-        
-        this.legMovement = 0;
     }
     
     destroy() {
