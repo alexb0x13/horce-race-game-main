@@ -314,7 +314,20 @@ class Horse {
             const nameOffsetX = this.sprite.width * this.sprite.scale * 0.5;
             const nameOffsetY = this.sprite.height * this.sprite.scale * 0.5;
             const horizontalVariation = (this.lane % 2 === 0) ? -40 - (this.lane * 3) : 40 + (this.lane * 3);
-            const verticalVariation = -40 - (this.lane * 5); 
+            
+            // Determine if horse is in the top portion of the track
+            const isInTopPortion = this.sprite.y < this.scene.scale.height * 0.3;
+            
+            // Adjust vertical position based on horse location
+            let verticalVariation;
+            if (isInTopPortion) {
+                // When horse is at top of track, position label below or beside the horse
+                verticalVariation = 30 + (this.lane * 2); // Positive value moves label down
+            } else {
+                // Normal positioning for other parts of track
+                verticalVariation = -40 - (this.lane * 5); // Negative value moves label up
+            }
+            
             this.nameText.x = this.sprite.x - nameOffsetX + horizontalVariation;
             this.nameText.y = this.sprite.y - nameOffsetY + verticalVariation;
             
