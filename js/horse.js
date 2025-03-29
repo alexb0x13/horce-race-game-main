@@ -90,6 +90,10 @@ class Horse {
         
         // Initialize sprite
         this.createSprite();
+        
+        // Unique bobbing rate for each horse
+        this.bobbingRate = 0.015 + (Math.random() * 0.01 - 0.005); // Range: 0.01 to 0.02
+        this.bobbingPhase = Math.random() * Math.PI * 2; // Random starting phase (0 to 2π)
     }
     
     getRandomColor() {
@@ -321,9 +325,9 @@ class Horse {
         // Update connecting line
         this.updateConnectingLine();
         
-        // Add a merry-go-round style bobbing motion
-        this.legMovement = (this.legMovement || 0) + delta * 0.015; // Slowed down from 0.04
-        const bobHeight = Math.sin(this.legMovement) * 5.5; // Increased height from 1 to 3.5
+        // Add a merry-go-round style bobbing motion with unique rate per horse
+        this.legMovement = (this.legMovement || this.bobbingPhase) + delta * this.bobbingRate;
+        const bobHeight = Math.sin(this.legMovement) * 5.5;
         this.sprite.y += bobHeight;
         
         // Check if horse has finished race
