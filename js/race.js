@@ -34,7 +34,7 @@ class RaceScene extends Phaser.Scene {
         this.load.image('crown', 'assets/crown-of-roses.png');
         
         // Load JEL Derby logo
-        this.load.image('logo', 'assets/jel-derby-logo3.png');
+        this.load.image('logo', 'assets/jel-derby-logo3.PNG');
         
         console.log("Preloading horse image and crown");
     }
