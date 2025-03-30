@@ -111,8 +111,8 @@ class Horse {
         this.sprite = this.scene.add.image(offsetX, startPosition.y, 'horse');
         
         // Scale the sprite to an even smaller size
-        const scaleBase = Math.min(this.scene.trackWidth, this.scene.trackHeight) / 25000;
-        this.sprite.setScale(Math.max(0.015, scaleBase));
+        const scaleBase = Math.min(this.scene.trackWidth, this.scene.trackHeight) / 35000;
+        this.sprite.setScale(Math.max(0.010, scaleBase));
         
         // Flip the sprite horizontally so horses face left at the start of the race
         this.sprite.scaleX = -this.sprite.scaleX;
@@ -120,8 +120,8 @@ class Horse {
         // Apply color tint to the horse silhouette
         this.sprite.setTint(this.color);
         
-        // Set initial rotation to match the track
-        this.sprite.rotation = startPosition.rotation + Math.PI/2; 
+        // Set initial rotation to match the track - adjusted for southeast orientation
+        this.sprite.rotation = startPosition.rotation + Math.PI/4; // Changed from Math.PI/2 to Math.PI/4 for southeast direction
         
         // Add running animation
         this.legMovement = 0;
@@ -273,24 +273,25 @@ class Horse {
         this.sprite.scaleX = isOnLeftHalf ? currentScale : -currentScale;
         
         // Set rotation based on track position and track section
-        // For the right half of track (normalized distance < 0.5 or > 0.95), use normal rotation
-        // For the left half (0.5 to 0.95), keep a more consistent rotation
+        // We want horses to consistently point southeast (Math.PI/4) around the entire track
         let finalRotation;
         
+        // Use a simplified rotation approach that maintains southeast orientation throughout
         if (isOnLeftHalf) {
-            // When on left half, use a fixed rotation angle with small adjustments
-            // This prevents horses from appearing upside down
-            const baseLeftRotation = -Math.PI/2; // Base rotation for left side
-            // Apply a small adjustment based on position to create smoother transitions
-            const leftPositionFactor = (normalizedDistance - 0.6) / 0.45; // 0 to 1 as horse moves through left half
-            const rotationAdjustment = Math.sin(leftPositionFactor * Math.PI) * 0.75; // Small subtle adjustment
-            finalRotation = baseLeftRotation + rotationAdjustment;
+            // When on left half, horses have been flipped horizontally
+            // So we use a positive PI/4 to point southeast
+            finalRotation = Math.PI/4;
         } else {
-            // Normal rotation calculation for right half
-            finalRotation = trackPos.rotation + Math.PI/2;
+            // On right half, maintain southeast pointing using the initial orientation
+            finalRotation = Math.PI/4;
         }
         
-        this.sprite.rotation = finalRotation;
+        // Add a very small adjustment based on track position for subtle natural movement
+        // but not enough to change the general southeast direction
+        const positionFactor = normalizedDistance * Math.PI * 2;
+        const smallAdjustment = Math.sin(positionFactor) * 0.1; // Very small rotation adjustment
+        
+        this.sprite.rotation = finalRotation + smallAdjustment;
         
         // Update name text position only if horse is in first place
         if (this.nameText && this.position === 1) {
@@ -526,24 +527,25 @@ class Horse {
         this.sprite.scaleX = isOnLeftHalf ? currentScale : -currentScale;
         
         // Set rotation based on track position and track section
-        // For the right half of track (normalized distance < 0.5 or > 0.95), use normal rotation
-        // For the left half (0.5 to 0.95), keep a more consistent rotation
+        // We want horses to consistently point southeast (Math.PI/4) around the entire track
         let finalRotation;
         
+        // Use a simplified rotation approach that maintains southeast orientation throughout
         if (isOnLeftHalf) {
-            // When on left half, use a fixed rotation angle with small adjustments
-            // This prevents horses from appearing upside down
-            const baseLeftRotation = -Math.PI/2; // Base rotation for left side
-            // Apply a small adjustment based on position to create smoother transitions
-            const leftPositionFactor = (normalizedDistance - 0.6) / 0.45; // 0 to 1 as horse moves through left half
-            const rotationAdjustment = Math.sin(leftPositionFactor * Math.PI) * 0.75; // Small subtle adjustment
-            finalRotation = baseLeftRotation + rotationAdjustment;
+            // When on left half, horses have been flipped horizontally
+            // So we use a positive PI/4 to point southeast
+            finalRotation = Math.PI/4;
         } else {
-            // Normal rotation calculation for right half
-            finalRotation = trackPos.rotation + Math.PI/2;
+            // On right half, maintain southeast pointing using the initial orientation
+            finalRotation = Math.PI/4;
         }
         
-        this.sprite.rotation = finalRotation;
+        // Add a very small adjustment based on track position for subtle natural movement
+        // but not enough to change the general southeast direction
+        const positionFactor = normalizedDistance * Math.PI * 2;
+        const smallAdjustment = Math.sin(positionFactor) * 0.1; // Very small rotation adjustment
+        
+        this.sprite.rotation = finalRotation + smallAdjustment;
         
         // Update name text position only if horse is in first place
         if (this.nameText && this.position === 1) {
@@ -608,7 +610,7 @@ class Horse {
         
         this.sprite.x = offsetX;
         this.sprite.y = startPosition.y;
-        this.sprite.rotation = startPosition.rotation + Math.PI/2;
+        this.sprite.rotation = startPosition.rotation + Math.PI/4;
         
         // Update name text position
         const nameOffsetX = this.sprite.width * this.sprite.scale * 0.5;
