@@ -111,8 +111,8 @@ class Horse {
         this.sprite = this.scene.add.image(offsetX, startPosition.y, 'horse');
         
         // Scale the sprite to an even smaller size
-        const scaleBase = Math.min(this.scene.trackWidth, this.scene.trackHeight) / 25000;
-        this.sprite.setScale(Math.max(0.015, scaleBase));
+        const scaleBase = Math.min(this.scene.trackWidth, this.scene.trackHeight) / 35000;
+        this.sprite.setScale(Math.max(0.013, scaleBase));
         
         // Flip the sprite horizontally so horses face left at the start of the race
         this.sprite.scaleX = -this.sprite.scaleX;
