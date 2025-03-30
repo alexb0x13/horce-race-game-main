@@ -21,6 +21,9 @@ class RaceScene extends Phaser.Scene {
         this.trackHeight = 0;
         this.trackCenterX = 0;
         this.trackCenterY = 0;
+        
+        // Sound effects
+        this.sounds = {};
     }
     
     preload() {
@@ -35,6 +38,9 @@ class RaceScene extends Phaser.Scene {
         
         // Load JEL Derby logo
         this.load.image('logo', 'assets/jel-derby-logo3.PNG');
+        
+        // Load race start sound
+        this.load.audio('raceStart', 'assets/race-start.m4a');
         
         console.log("Preloading horse image and crown");
         
@@ -84,6 +90,12 @@ class RaceScene extends Phaser.Scene {
     startCreate() {
         // Set track dimensions based on screen size
         this.updateTrackDimensions();
+        
+        // Initialize sound effects
+        this.sounds = {
+            raceStart: this.sound.add('raceStart')
+        };
+        console.log("Sound effects initialized:", this.sounds);
         
         // Create track background
         this.trackBackground = this.add.image(0, 0, 'track').setOrigin(0, 0);
@@ -351,6 +363,18 @@ class RaceScene extends Phaser.Scene {
         if (this.raceInProgress) {
             console.log("Race already in progress");
             return;
+        }
+        
+        // Play the race start sound
+        try {
+            if (this.sounds && this.sounds.raceStart) {
+                this.sounds.raceStart.play();
+                console.log("Playing race start sound");
+            } else {
+                console.warn("Race start sound not available:", this.sounds);
+            }
+        } catch (e) {
+            console.error("Error playing race start sound:", e);
         }
         
         this.raceInProgress = true;
