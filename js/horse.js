@@ -96,26 +96,6 @@ class Horse {
         this.bobbingPhase = Math.random() * Math.PI * 2; // Random starting phase (0 to 2π)
     }
     
-    getRandomColor() {
-        const colors = [
-            0x000000, // Black
-            0xF5F5F5, // White Smoke
-            0xDA70D6, // Orchid
-            0x20B2AA, // Light Sea Green
-            0xFF033E, // American Rose
-            0xD2B48C, // Tan
-            0xFF8C00, // Dark Orange
-            0x32CD32, // Lime Green
-            0x4169E1, // Royal Blue
-            0xFF69B4, // Hot Pink
-            0xC0C0C0, // Silver
-            0xB8860B  // Dark Goldenrod
-        ];
-        
-        // Return a random color (this is only used as a fallback)
-        return colors[Math.floor(Math.random() * colors.length)];
-    }
-    
     createSprite() {
         // Calculate a small horizontal offset based on lane number to fan out horses at the start
         // This will position them slightly to the right

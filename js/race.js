@@ -273,7 +273,7 @@ class RaceScene extends Phaser.Scene {
             "Orchid Dream",     // Lane 3 (index 2) - Orchid
             "Shell Beach",      // Lane 4 (index 3) - Light Sea Green
             "Rose Runner",      // Lane 5 (index 4) - American Rose
-            "Dust Devil",     // Lane 6 (index 5) - Tan
+            "Duke Champion",    // Lane 6 (index 5) - Chocolate Brown
             "Amber Flare",      // Lane 7 (index 6) - Dark Orange
             "Green Lightning",  // Lane 8 (index 7) - Lime Green
             "Royal Thunder",    // Lane 9 (index 8) - Royal Blue
@@ -289,7 +289,7 @@ class RaceScene extends Phaser.Scene {
             "#DA70D6", // Orchid
             "#20B2AA", // Light Sea Green
             "#FF033E", // American Rose
-            "#B2996E", // Tan
+            "#964B00", // Chocolate Brown
             "#FFBF00", // Dark Orange
             "#32CD32", // Lime Green
             "#4169E1", // Royal Blue
@@ -635,7 +635,8 @@ class RaceScene extends Phaser.Scene {
         const normalizedDistance = (distance % this.trackLength) / this.trackLength;
         
         // Calculate angle based on normalized distance (0 to 2π)
-        const angle = normalizedDistance * Math.PI * 2;
+        // For counter-clockwise movement, we'll use 1-normalizedDistance to reverse the direction
+        const angle = (1 - normalizedDistance) * Math.PI * 2;
         
         // Calculate the base radius (without lane offset) - increased for larger path
         const baseRadiusX = (this.trackWidth / 2) - (this.trackWidth / 55);
@@ -650,7 +651,8 @@ class RaceScene extends Phaser.Scene {
         const y = this.trackCenterY + radiusY * Math.sin(angle);
         
         // Calculate rotation angle (tangent to the oval)
-        const rotationAngle = Math.atan2(-radiusY * Math.sin(angle), -radiusX * Math.cos(angle));
+        // For counter-clockwise, we just need to negate the angle components
+        const rotationAngle = Math.atan2(radiusY * Math.sin(angle), radiusX * Math.cos(angle));
         
         return { x, y, rotation: rotationAngle };
     }
@@ -818,5 +820,30 @@ class RaceScene extends Phaser.Scene {
         
         // Generate texture
         finishGraphics.generateTexture('finishLine', 10, 100);
+    }
+    
+    drawFinishLine() {
+        // Create a solid white finish line at 195 degree angle
+        const finishX = this.trackCenterX + (this.trackWidth * 0.52); // Positioned further right
+        const finishY = this.trackCenterY - (this.trackHeight * -0.04); // Slightly below center
+        const finishLineLength = this.trackHeight * 0.3; // Length of the finish line
+        const lineThickness = 10; // Thickness of the line
+        
+        // Save the current transformation
+        this.finishLine.save();
+        
+        // Translate to the position where we want the finish line
+        this.finishLine.translateCanvas(finishX, finishY);
+        
+        // Rotate by 195 degrees (converted to radians)
+        const angleInRadians = 195 * (Math.PI / 180);
+        this.finishLine.rotateCanvas(angleInRadians);
+        
+        // Draw a solid white line
+        this.finishLine.fillStyle(0xffffff, 1);
+        this.finishLine.fillRect(0, -lineThickness / 2, finishLineLength, lineThickness);
+        
+        // Restore the original transformation
+        this.finishLine.restore();
     }
 }
