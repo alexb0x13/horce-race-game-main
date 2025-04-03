@@ -505,6 +505,19 @@ class RaceScene extends Phaser.Scene {
             
             // Update the UI to show the final results
             this.updateResultsPanel();
+
+            // Log the list of winners
+            console.log("Winners so far:", this.finishedHorses.map(h => h.name).join(", "));
+
+            // Update the winners list in the UI
+            const winnersList = document.getElementById('winners-list');
+            if (winnersList) {
+                const li = document.createElement('li');
+                const now = new Date();
+                const timeString = now.toLocaleTimeString();
+                li.textContent = `${timeString} - ${winner.name}`;
+                winnersList.appendChild(li);
+            }
         } else if (this.finishedHorses.length === 1) {
             // Update status for first place finisher
         }
