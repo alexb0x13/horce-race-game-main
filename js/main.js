@@ -59,15 +59,15 @@ document.addEventListener('DOMContentLoaded', function() {
         startRaceButton.addEventListener('click', function() {
             console.log("Start race button clicked, race scene:", raceScene);
             if (raceScene && !raceScene.raceInProgress) {
-                // Directly play the race start sound here, as it needs user interaction
-                try {
-                    // Try playing sound directly through the audio element API
+                // Check if the race start sound is already playing
+                if (!raceScene.raceStartSoundPlaying) {
                     const startSound = new Audio('assets/race-start.m4a');
                     startSound.volume = 1.0;
                     startSound.play().catch(err => console.error("Failed to play sound:", err));
                     console.log("Playing race start sound from button click");
-                } catch(e) {
-                    console.error("Error attempting to play sound:", e);
+                    raceScene.raceStartSoundPlaying = true;
+                } else {
+                    console.log("Race start sound already playing");
                 }
                 
                 raceScene.startRace();
@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (raceScene) {
                 raceScene.resetRace();
                 startRaceButton.disabled = false;
+                raceScene.raceStartSoundPlaying = false; // Reset the flag
             }
         });
         

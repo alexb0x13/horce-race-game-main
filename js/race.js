@@ -24,6 +24,9 @@ class RaceScene extends Phaser.Scene {
         
         // Sound effects
         this.sounds = {};
+        
+        // Add a flag to track if the race start sound is playing
+        this.raceStartSoundPlaying = false;
     }
     
     preload() {
@@ -41,6 +44,9 @@ class RaceScene extends Phaser.Scene {
         
         // Load race start sound
         this.load.audio('raceStart', 'assets/race-start.m4a');
+        
+        // Load horse galloping sound
+        this.load.audio('galloping', 'assets/horse-galloping.mp3');
         
         console.log("Preloading horse image and crown");
         
@@ -93,7 +99,8 @@ class RaceScene extends Phaser.Scene {
         
         // Initialize sound effects
         this.sounds = {
-            raceStart: this.sound.add('raceStart')
+            raceStart: this.sound.add('raceStart'),
+            galloping: this.sound.add('galloping')
         };
         console.log("Sound effects initialized:", this.sounds);
         
@@ -366,15 +373,33 @@ class RaceScene extends Phaser.Scene {
         }
         
         // Play the race start sound
-        try {
-            if (this.sounds && this.sounds.raceStart) {
-                this.sounds.raceStart.play();
-                console.log("Playing race start sound");
-            } else {
-                console.warn("Race start sound not available:", this.sounds);
-            }
-        } catch (e) {
-            console.error("Error playing race start sound:", e);
+        if (this.sounds && this.sounds.raceStart) {
+            this.sounds.raceStart.play();
+            console.log("Playing race start sound");
+
+            // Smooth transition to galloping sound
+            setTimeout(() => {
+                if (this.sounds.galloping) {
+                    const galloping1 = this.sound.add('galloping');
+                    galloping1.play({ loop: true });
+                    console.log("Playing first instance of galloping sound");
+
+                    // Start two more instances with slight delays
+                    setTimeout(() => {
+                        const galloping2 = this.sound.add('galloping');
+                        galloping2.play({ loop: true });
+                        console.log("Playing second instance of galloping sound");
+                    }, 1300);
+
+                    setTimeout(() => {
+                        const galloping3 = this.sound.add('galloping');
+                        galloping3.play({ loop: true });
+                        console.log("Playing third instance of galloping sound");
+                    }, 2100);
+                }
+            }, 2100); // Delay for smooth transition
+        } else {
+            console.warn("Race start sound not available:", this.sounds);
         }
         
         this.raceInProgress = true;
@@ -454,10 +479,24 @@ class RaceScene extends Phaser.Scene {
         this.finishedHorses.push(horse);
         horse.position = this.finishedHorses.length;
         
+        // Check if half the horses have finished and stop galloping sounds
+        if (this.finishedHorses.length >= this.numHorses / 2) {
+            if (this.sounds.galloping) {
+                this.sound.stopAll(); // Stop all instances of galloping sound
+                console.log("Stopped all galloping sounds as half the horses have finished");
+            }
+        }
+        
         // If all horses have finished
         if (this.finishedHorses.length >= this.numHorses) {
             this.raceInProgress = false;
             console.log("Race completed!");
+            
+            // Stop the galloping sound when the race ends
+            if (this.sounds && this.sounds.galloping) {
+                this.sounds.galloping.stop();
+                console.log("Stopped galloping sound");
+            }
             
             // Display the winner prominently
             const winner = this.finishedHorses[0];
