@@ -437,16 +437,31 @@ class Horse {
         // Update position for label visibility checks
         const newPosition = position + 1; // 1-indexed position
         
-        // If position changed, update visibility of labels
-        if (newPosition !== this.position) {
+        // Calculate race progress - used for final stretch detection
+        const totalRaceDistance = this.scene.totalLaps * this.scene.trackLength;
+        const raceProgress = this.distance / totalRaceDistance;
+        const isInFinalStretch = raceProgress > 0.9; // Hide labels in final 10% of race
+        
+        // If in final stretch, hide all labels regardless of position
+        if (isInFinalStretch && this.nameText && this.nameText.visible) {
+            this.nameText.setVisible(false);
+            if (this.connectingLine) {
+                this.connectingLine.clear();
+            }
+            if (this.position === 1) {
+                console.log(`${this.name} entered final stretch - hiding label`);
+            }
+        }
+        // Otherwise, handle normal position-based visibility
+        else if (newPosition !== this.position) {
             const wasFirstPlace = this.position === 1;
             const isNowFirstPlace = newPosition === 1;
             
             this.position = newPosition;
             
-            // Update nameText visibility - only first place gets a label
-            if (this.nameText) {
-                // Show label only if we're in first place
+            // Update nameText visibility - only first place gets a label if not in final stretch
+            if (this.nameText && !isInFinalStretch) {
+                // Show label only if we're in first place and not in final stretch
                 this.nameText.setVisible(isNowFirstPlace);
                 
                 // Clear the connecting line when losing first place
