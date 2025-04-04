@@ -136,7 +136,7 @@ class Horse {
         // Convert the horse color from hex number to hex string for text color
         const colorHex = '#' + this.color.toString(16).padStart(6, '0');
         
-        const strokeColor = (this.lane === 0) ? '#FFFFFF' : '#000000';
+        const strokeColor = (this.lane === 0) ? '#ddd' : '#ddd';
         this.laneText = this.scene.add.text(20, laneTextY + laneTextYOffset, `#${this.lane + 1}: ${this.name}`, { 
             fontSize: '28px', 
             fontFamily: '"Inter", Arial, sans-serif',
@@ -645,10 +645,14 @@ class Horse {
             this.connectingLine.clear();
         }
         
-        // Update the lane text with new traits
+        // Update the lane text with odds only
         if (this.laneText) {
-            // Only update the lane number and name, without traits
-            this.laneText.setText(`#${this.lane + 1}: ${this.name}`);
+            // Display name and odds only
+            const oddsText = this.odds ? ` ${this.odds}-1` : "";
+            this.laneText.setText(`#${this.lane + 1}: ${this.name} ${oddsText}`);
+            
+            // Log just the odds for verification
+            console.log(`${this.name} - Odds: ${this.odds}-1`);
         }
         
         this.legMovement = 0;
@@ -725,12 +729,31 @@ class Horse {
         
         // Moderate luck factor - still allows for some randomness
         this.luckFactor = Math.random() * 0.2 + 0.05; // Between 0.05 and 0.25 (reduced)
+        
+        // Calculate odds based on horse's attributes (simple version)
+        this.calculateOdds();
     }
     
-    destroy() {
-        if (this.group) {
-            this.group.destroy(true);
+    // Calculate simple odds based on horse attributes
+    calculateOdds() {
+        // Base odds on the horse's primary strength
+        let baseOdds;
+        
+        if (this.traits.includes("Fast")) {
+            baseOdds = 3 + Math.floor(Math.random() * 3); // 3-5
+        } else if (this.traits.includes("Endurance")) {
+            baseOdds = 4 + Math.floor(Math.random() * 3); // 4-6
+        } else if (this.traits.includes("Quick Starter")) {
+            baseOdds = 5 + Math.floor(Math.random() * 4); // 5-8
+        } else {
+            baseOdds = 6 + Math.floor(Math.random() * 5); // 6-10 for Balanced
         }
+        
+        // Add some randomness to create variety
+        const randomFactor = Math.floor(Math.random() * 7) - 3; // -3 to +3
+        this.odds = Math.max(2, Math.min(15, baseOdds + randomFactor));
+        
+        return this.odds;
     }
     
     finishRace(time) {
