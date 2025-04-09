@@ -292,7 +292,7 @@ class RaceScene extends Phaser.Scene {
             "Orchid Dream",     // Lane 3 (index 2) - Orchid
             "Shell Beach",      // Lane 4 (index 3) - Light Sea Green
             "Rose Runner",      // Lane 5 (index 4) - American Rose
-            "Duke Champion",    // Lane 6 (index 5) - Chocolate Brown
+            "Duke Chestnut",    // Lane 6 (index 5) - Chestnut
             "Amber Flare",      // Lane 7 (index 6) - Dark Orange
             "Green Lightning",  // Lane 8 (index 7) - Lime Green
             "Royal Thunder",    // Lane 9 (index 8) - Royal Blue
