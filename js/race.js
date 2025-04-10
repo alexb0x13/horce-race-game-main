@@ -711,7 +711,8 @@ class RaceScene extends Phaser.Scene {
         const normalizedDistance = (distance % this.trackLength) / this.trackLength;
         
         // Calculate angle based on normalized distance (0 to 2π)
-        const angle = normalizedDistance * Math.PI * 2;
+        // For counter-clockwise movement, we'll use 1-normalizedDistance to reverse the direction
+        const angle = (1 - normalizedDistance) * Math.PI * 2;
         
         // Calculate the base radius (without lane offset) - increased for larger path
         const baseRadiusX = (this.trackWidth / 2) - (this.trackWidth / 55);
@@ -726,7 +727,8 @@ class RaceScene extends Phaser.Scene {
         const y = this.trackCenterY + radiusY * Math.sin(angle);
         
         // Calculate rotation angle (tangent to the oval)
-        const rotationAngle = Math.atan2(-radiusY * Math.sin(angle), -radiusX * Math.cos(angle));
+        // For counter-clockwise, we just need to negate the angle components
+        const rotationAngle = Math.atan2(radiusY * Math.sin(angle), radiusX * Math.cos(angle));
         
         return { x, y, rotation: rotationAngle };
     }

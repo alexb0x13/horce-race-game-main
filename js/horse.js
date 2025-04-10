@@ -263,27 +263,29 @@ class Horse {
         this.sprite.x = trackPos.x;
         this.sprite.y = trackPos.y;
         
-        // Determine if the horse is on the left half of the track (between 25% and 75% of track length)
-        // This checks if the horse is roughly on the left side of the oval
+        // For counter-clockwise racing, using 1-normalizedDistance in race.js means:
+        // - Top half (0.75-0.25): horses run left to right
+        // - Bottom half (0.25-0.75): horses run right to left
         const normalizedDistance = lapDistance / this.scene.trackLength;
-        const isOnLeftHalf = normalizedDistance > 0.5 && normalizedDistance < 0.95;
+        const isOnBottomHalf = normalizedDistance >= 0.50 && normalizedDistance < 0.99;
         
-        // Set scale to flip horizontally when on left half
+        // Set scale to flip horizontally when on bottom half (going right to left)
         const currentScale = Math.abs(this.sprite.scaleX);
-        this.sprite.scaleX = isOnLeftHalf ? currentScale : -currentScale;
+        this.sprite.scaleX = isOnBottomHalf ? currentScale : -currentScale;
         
         // Set rotation based on track position and track section
         // We want horses to consistently point southeast (Math.PI/4) around the entire track
         let finalRotation;
         
         // Use a simplified rotation approach that maintains southeast orientation throughout
-        if (isOnLeftHalf) {
-            // When on left half, horses have been flipped horizontally
-            // So we use a positive PI/4 to point southeast
-            finalRotation = Math.PI/4;
+        if (isOnBottomHalf) {
+            // When on bottom half, horses are running left (and have been flipped)
+            // So we use a negative angle to point slightly upward (toward the center)
+            finalRotation = -Math.PI/11; // -30 degrees
         } else {
-            // On right half, maintain southeast pointing using the initial orientation
-            finalRotation = Math.PI/4;
+            // On top half, horses are running right
+            // So we use a positive angle to point slightly downward (toward the center)
+            finalRotation = Math.PI/11; // 30 degrees
         }
         
         // Add a very small adjustment based on track position for subtle natural movement
@@ -532,27 +534,29 @@ class Horse {
         this.sprite.x = trackPos.x;
         this.sprite.y = trackPos.y;
         
-        // Determine if the horse is on the left half of the track (between 25% and 75% of track length)
-        // This checks if the horse is roughly on the left side of the oval
+        // For counter-clockwise racing, using 1-normalizedDistance in race.js means:
+        // - Top half (0.75-0.25): horses run left to right
+        // - Bottom half (0.25-0.75): horses run right to left
         const normalizedDistance = lapDistance / this.scene.trackLength;
-        const isOnLeftHalf = normalizedDistance > 0.5 && normalizedDistance < 0.95;
+        const isOnBottomHalf = normalizedDistance >= 0.25 && normalizedDistance < 0.75;
         
-        // Set scale to flip horizontally when on left half
+        // Set scale to flip horizontally when on bottom half (going right to left)
         const currentScale = Math.abs(this.sprite.scaleX);
-        this.sprite.scaleX = isOnLeftHalf ? currentScale : -currentScale;
+        this.sprite.scaleX = isOnBottomHalf ? currentScale : -currentScale;
         
         // Set rotation based on track position and track section
         // We want horses to consistently point southeast (Math.PI/4) around the entire track
         let finalRotation;
         
         // Use a simplified rotation approach that maintains southeast orientation throughout
-        if (isOnLeftHalf) {
-            // When on left half, horses have been flipped horizontally
-            // So we use a positive PI/4 to point southeast
-            finalRotation = Math.PI/4;
+        if (isOnBottomHalf) {
+            // When on bottom half, horses are running left (and have been flipped)
+            // So we use a negative angle to point slightly upward (toward the center)
+            finalRotation = -Math.PI/6; // -30 degrees
         } else {
-            // On right half, maintain southeast pointing using the initial orientation
-            finalRotation = Math.PI/4;
+            // On top half, horses are running right
+            // So we use a positive angle to point slightly downward (toward the center)
+            finalRotation = Math.PI/6; // 30 degrees
         }
         
         // Add a very small adjustment based on track position for subtle natural movement
