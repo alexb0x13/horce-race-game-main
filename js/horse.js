@@ -267,7 +267,7 @@ class Horse {
         // - Top half (0.75-0.25): horses run left to right
         // - Bottom half (0.25-0.75): horses run right to left
         const normalizedDistance = lapDistance / this.scene.trackLength;
-        const isOnBottomHalf = normalizedDistance >= 0.50 && normalizedDistance < 0.99;
+        const isOnBottomHalf = normalizedDistance >= 0.50 && normalizedDistance < 0.96;
         
         // Set scale to flip horizontally when on bottom half (going right to left)
         const currentScale = Math.abs(this.sprite.scaleX);
@@ -281,7 +281,7 @@ class Horse {
         if (isOnBottomHalf) {
             // When on bottom half, horses are running left (and have been flipped)
             // So we use a negative angle to point slightly upward (toward the center)
-            finalRotation = -Math.PI/11; // -30 degrees
+            finalRotation = -Math.PI/-5; // -30 degrees
         } else {
             // On top half, horses are running right
             // So we use a positive angle to point slightly downward (toward the center)
