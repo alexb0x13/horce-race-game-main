@@ -649,15 +649,7 @@ class Horse {
             this.connectingLine.clear();
         }
         
-        // Update the lane text with odds only
-        if (this.laneText) {
-            // Display name and odds only
-            const oddsText = this.odds ? ` ${this.odds}-1` : "";
-            this.laneText.setText(`#${this.lane + 1}: ${this.name} ${oddsText}`);
-            
-            // Log just the odds for verification
-            console.log(`${this.name} - Odds: ${this.odds}-1`);
-        }
+        
         
         this.legMovement = 0;
     }
