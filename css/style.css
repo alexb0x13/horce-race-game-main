@@ -34,24 +34,22 @@ canvas {
     display: block;
 }
 
-/* Top banner styling */
+/* Top banner styling - Simplified */
 .top-banner {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(to right, #1a5276, #2980b9, #1a5276);
-    padding: 6px 20px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    background: rgba(26, 82, 118, 0.7); /* Semi-transparent blue */
+    padding: 4px 10px;
     z-index: 10;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    height: auto;
-    max-height: 70px;
-    border-bottom: 2px solid #f1c40f;
-    overflow: hidden; /* Prevent content from overflowing */
+    height: 50px;
+    backdrop-filter: blur(3px); /* Slight blur effect */
+    border-bottom: 1px solid rgba(241, 196, 15, 0.5);
 }
 
 .side-panel {
@@ -150,6 +148,7 @@ canvas {
     color: #fff; /* Restoring original color */
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
     font-family: 'Inter', sans-serif;
+    font-weight: 900;
     max-width: 100%;
 }
 

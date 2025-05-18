@@ -136,15 +136,43 @@ class Horse {
         // Convert the horse color from hex number to hex string for text color
         const colorHex = '#' + this.color.toString(16).padStart(6, '0');
         
-        const strokeColor = (this.lane === 0) ? '#ddd' : '#000';
-        this.laneText = this.scene.add.text(20, laneTextY + laneTextYOffset, `#${this.lane + 1}: ${this.name}`, { 
-            fontSize: '28px', 
+        const strokeColor = (this.lane === 0) ? '#2D2D2D' : '#000';
+        
+        // Position constants
+        const textX = 24;
+        const textY = laneTextY + laneTextYOffset;
+        const padding = 8;
+        
+        // Create text first to measure its dimensions
+        this.laneText = this.scene.add.text(0, 0, `#${this.lane + 1}: ${this.name}`, { 
+            fontSize: '22px', 
             fontFamily: '"Inter", Arial, sans-serif',
-            fontWeight: '900', 
+            fontWeight: '400', 
             color: colorHex,
             stroke: strokeColor, 
-            strokeThickness: 2
+            strokeThickness: 4,
+            padding: { x: padding, y: padding/2 }
         });
+        
+        // Position the text first
+        this.laneText.setPosition(textX, textY);
+        
+        // Create a more compact semi-transparent background
+        const bg = this.scene.add.rectangle(
+            textX + 2, // Slight offset to account for stroke
+            textY + this.laneText.height/2, // Center vertically
+            this.laneText.width * 0.7, // 90% of text width
+            this.laneText.height * 0.7, // 70% of text height
+            0x808080, // Gray background
+            0.4 // 40% opacity
+        ).setOrigin(0, 0.5); // Center vertically
+        
+        // Set depth to ensure text is above the background
+        bg.setDepth(1);
+        this.laneText.setDepth(2);
+        
+        // Store reference to the background for cleanup
+        this.laneText.background = bg;
         
         // Add varying offsets based on lane number to prevent stacking
         // Position labels further away from horses to make room for connecting lines

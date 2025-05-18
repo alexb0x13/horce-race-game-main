@@ -289,7 +289,7 @@ class RaceScene extends Phaser.Scene {
         const specificHorses = [
             "Fusaichi Pegasus", // Lane 1 (index 0) - Black
             "Aura Boost",       // Lane 2 (index 1) - White Smoke
-            "Orchid Dream",     // Lane 3 (index 2) - Orchid
+            "Extra Credit",     // Lane 3 (index 2) - Orchid
             "Shell Beach",      // Lane 4 (index 3) - Light Sea Green
             "Rose Runner",      // Lane 5 (index 4) - American Rose
             "Duke Chestnut",    // Lane 6 (index 5) - Chestnut
@@ -609,10 +609,11 @@ class RaceScene extends Phaser.Scene {
             sortedHorses.slice(0, 7).forEach((horse, index) => {
                 const horseElement = document.createElement('div');
                 horseElement.className = 'horse-item';
+                const horseColor = Phaser.Display.Color.IntegerToColor(horse.color).rgba;
                 horseElement.innerHTML = `
                     <div class="horse-position" style="color: yellow; font-weight: bold;">${index + 1}</div> &nbsp;
-                    <div class="horse-color" style="background-color: ${Phaser.Display.Color.IntegerToColor(horse.color).rgba}"></div>
-                    <div class="horse-name">${horse.name}</div>
+                    <div class="horse-color" style="background-color: ${horseColor}"></div>
+                    <div class="horse-name" style="color: ${horseColor}">${horse.name}</div>
                 `;
                 horseListElement.appendChild(horseElement);
             });
